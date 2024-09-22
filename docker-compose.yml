@@ -1,28 +1,39 @@
-version: '3.8'
-
 services:
-  db:
+  pgsql:
     image: postgres:14
     environment:
-      POSTGRES_DB: Skill
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: root
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${USER_DB}
+      POSTGRES_PASSWORD: ${PASSWORD_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
-      - "5433:5432"
+      - ${PORT_DB}:5432
 
-  web:
-    build: .
-    environment:
-      FLASK_APP: app
-      FLASK_ENV: development
-      SQLALCHEMY_DATABASE_URI: postgresql+psycopg2://postgres:root@172.17.37.49:5433/Skill
-      JWT_SECRET_KEY: f3c4e5d6a7b8c9d0e1f2g3h4i5j6k7l8m9
-    ports:
-      - "5000:5000"
+  python:
+    build:
+      context: .
+      dockerfile: ./.docker/python.Dockerfile
     depends_on:
-      - db
+      - pgsql
+    ports:
+      - 5000:5000
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+
+  # web:
+  #   build: .
+  #   environment:
+  #     FLASK_APP: app
+  #     FLASK_ENV: development
+  #     SQLALCHEMY_DATABASE_URI: postgresql://postgres:root@db:5432/Skill
+  #     JWT_SECRET_KEY: f3c4e5d6a7b8c9d0e1f2g3h4i5j6k7l8m9
+  #   ports:
+  #     - "5000:5000"
+  #   depends_on:
+  #     - db
 
 volumes:
   postgres_data:
