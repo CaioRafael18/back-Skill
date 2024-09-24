@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${USER_DB}
       POSTGRES_PASSWORD: ${PASSWORD_DB}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data_safelab:/var/lib/postgresql/data
     ports:
       - ${PORT_DB}:5432
 
@@ -23,17 +23,5 @@ services:
     env_file:
       - .env
 
-  # web:
-  #   build: .
-  #   environment:
-  #     FLASK_APP: app
-  #     FLASK_ENV: development
-  #     SQLALCHEMY_DATABASE_URI: postgresql://postgres:root@db:5432/Skill
-  #     JWT_SECRET_KEY: f3c4e5d6a7b8c9d0e1f2g3h4i5j6k7l8m9
-  #   ports:
-  #     - "5000:5000"
-  #   depends_on:
-  #     - db
-
 volumes:
-  postgres_data:
+  postgres_data_safelab:
