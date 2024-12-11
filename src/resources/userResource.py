@@ -3,6 +3,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import create_access_token
 from src.models.Administrador import Administrador
 from src.models.Professor import Professor
+from src.models.Aluno import Aluno
 
 from src.models.User import User
 from src.helpers.database import db
@@ -15,7 +16,7 @@ class UserRegisterResource(Resource):
         self.parser.add_argument('matricula', type=str, help='Matricula obrigatório', required=True)
         self.parser.add_argument('email', type=str, help='Email obrigatório', required=True)
         self.parser.add_argument('password', type=str, help='Senha obrigatório', required=True)
-        self.parser.add_argument('is_admin', type=bool, help='Indica se o usuário é administrador', required=True)
+        self.parser.add_argument('type', type=str, help='Tipo do usuário obrigatório', required=True)
 
     def post(self):
         args = self.parser.parse_args()
@@ -24,21 +25,24 @@ class UserRegisterResource(Resource):
         matricula = args['matricula']
         email = args['email']
         password = args['password']
-        is_admin = args['is_admin']
+        type = args['type']
         
         passwordHash = generate_password_hash(password, method='pbkdf2:sha256')
         
-        newUser = User(name=name, matricula=matricula, email=email, password=passwordHash, is_admin=is_admin)
+        newUser = User(name=name, matricula=matricula, email=email, password=passwordHash, type=type)
         
         try:
             db.session.add(newUser)
             db.session.commit()
-            if(is_admin):
-                new_administrador = Administrador(user_id=newUser.id,name=newUser.name, matricula=newUser.matricula, email=newUser.email, password=password)
+            if(type == 'admin'):
+                new_administrador = Administrador(user_id=newUser.id)
                 db.session.add(new_administrador)
-            else:
-                new_professor = Professor(user_id=newUser.id,name=newUser.name, matricula=newUser.matricula, email=newUser.email, password=password)
+            elif(type == 'professor'):
+                new_professor = Professor(user_id=newUser.id)
                 db.session.add(new_professor)
+            elif(type == 'aluno'):
+                new_aluno = Aluno(user_id=newUser.id)
+                db.session.add(new_aluno)
             db.session.commit()
             
             return {"mensagem": "Usuário Cadastrado!"}, 201
@@ -58,7 +62,7 @@ class UsersResource(Resource):
         try:
             users = User.query.all()  
             users_list = [
-                {"id": user.id, "name": user.name, "matricula": user.matricula, "email": user.email}
+                {"id": user.id, "name": user.name, "matricula": user.matricula, "email": user.email, "type" : user.type}
                 for user in users
             ]
             return {"usuarios": users_list}, 200

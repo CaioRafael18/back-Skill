@@ -9,7 +9,7 @@ class listAdministradores(Resource):
                 {
                     "id": administrador.id,
                     "user_id": administrador.user_id,
-                    "matricula": administrador.matricula,
+                    "matricula": administrador.user.matricula,
                     "name": administrador.user.name,
                     "email": administrador.user.email
                 }

@@ -9,7 +9,7 @@ class listProfessores(Resource):
                 {
                     "id": professor.id,
                     "user_id": professor.user_id,
-                    "matricula": professor.matricula,
+                    "matricula": professor.user.matricula,
                     "name": professor.user.name,
                     "email": professor.user.email
                 }
